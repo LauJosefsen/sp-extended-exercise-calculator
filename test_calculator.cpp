@@ -6,98 +6,101 @@
 
 TEST_CASE("Calculate expressions lazily")
 {
-    auto symbol_table_dictionary = map<string, double>{};
-    auto a = expr_t(make_shared<var_t>("a", 2, symbol_table_dictionary));
-    auto b = expr_t(make_shared<var_t>("b", 3, symbol_table_dictionary));
-    auto c = expr_t(make_shared<var_t>("c", 4, symbol_table_dictionary));
-    auto d = expr_t(make_shared<var_t>("d", 0, symbol_table_dictionary));
+    // setup symbol table with unordered map
+    auto st = unordered_map<string, double>{};
+
+    // setup expression
+    auto a = expr_t(make_shared<var_t>("a", 2, st));
+    auto b = expr_t(make_shared<var_t>("b", 3, st));
+    auto c = expr_t(make_shared<var_t>("c", 4, st));
+    auto d = expr_t(make_shared<var_t>("d", 0, st));
 
     auto os = std::ostringstream();
 
     SUBCASE("Addition of variables")
     {
-        CHECK((a + b)(symbol_table_dictionary) == 5);
-        CHECK((c + b)(symbol_table_dictionary) == 7);
-        CHECK((c + a)(symbol_table_dictionary) == 6);
+        CHECK((a + b)(st) == 5);
+        CHECK((c + b)(st) == 7);
+        CHECK((c + a)(st) == 6);
     }
 
     SUBCASE("Subtraction of variables")
     {
-        CHECK((a - b)(symbol_table_dictionary) == -1);
-        CHECK((c - b)(symbol_table_dictionary) == 1);
-        CHECK((c - a)(symbol_table_dictionary) == 2);
+        CHECK((a - b)(st) == -1);
+        CHECK((c - b)(st) == 1);
+        CHECK((c - a)(st) == 2);
     }
 
     SUBCASE("Division of variables")
     {
-        CHECK((a / b)(symbol_table_dictionary) == 2.0 / 3);
-        CHECK((c / b)(symbol_table_dictionary) == 4.0 / 3);
-        CHECK((c / a)(symbol_table_dictionary) == 2);
+        CHECK((a / b)(st) == 2.0 / 3);
+        CHECK((c / b)(st) == 4.0 / 3);
+        CHECK((c / a)(st) == 2);
     }
 
     SUBCASE("Reading the value of a variable from state")
     {
-        CHECK(a(symbol_table_dictionary) == 2);
-        CHECK(b(symbol_table_dictionary) == 3);
-        CHECK(c(symbol_table_dictionary) == 4);
+        CHECK(a(st) == 2);
+        CHECK(b(st) == 3);
+        CHECK(c(st) == 4);
     }
     SUBCASE("Unary operations")
     {
-        CHECK((+a)(symbol_table_dictionary) == 2);
-        CHECK((-b)(symbol_table_dictionary) == -3);
-        CHECK((-c)(symbol_table_dictionary) == -4);
+        CHECK((+a)(st) == 2);
+        CHECK((-b)(st) == -3);
+        CHECK((-c)(st) == -4);
     }
     SUBCASE("Addition and subtraction")
     {
-        CHECK((a + b)(symbol_table_dictionary) == 5);
-        CHECK((a - b)(symbol_table_dictionary) == -1);
+        CHECK((a + b)(st) == 5);
+        CHECK((a - b)(st) == -1);
         // the state should not have changed:
-        CHECK(a(symbol_table_dictionary) == 2);
-        CHECK(b(symbol_table_dictionary) == 3);
-        CHECK(c(symbol_table_dictionary) == 4);
+        CHECK(a(st) == 2);
+        CHECK(b(st) == 3);
+        CHECK(c(st) == 4);
     }
     SUBCASE("Assignment expression evaluation")
     {
-        CHECK(c(symbol_table_dictionary) == 4);
-        CHECK((c <<= b - a)(symbol_table_dictionary) == 1);
-        CHECK(c(symbol_table_dictionary) == 1);
+        CHECK(c(st) == 4);
+        CHECK((c <<= b - a)(st) == 1);
+        CHECK(c(st) == 1);
 
-        CHECK((c += b - a * c)(symbol_table_dictionary) == 2);
-        CHECK(c(symbol_table_dictionary) == 2);
-        CHECK((c += b - a * c)(symbol_table_dictionary) == 1);
-        CHECK(c(symbol_table_dictionary) == 1);
+        CHECK((c += b - a * c)(st) == 2);
+        CHECK(c(st) == 2);
+        CHECK((c += b - a * c)(st) == 1);
+        CHECK(c(st) == 1);
 
-        CHECK_THROWS_MESSAGE((c - a += b - c), "assignment destination must be a variable expression");
+        CHECK_THROWS_MESSAGE((c - a += b - c)(st), "assignment destination must be a variable expression");
     }
     SUBCASE("Parenthesis")
     {
-        CHECK((a - (b - c))(symbol_table_dictionary) == 3);
-        CHECK((a - (b - a))(symbol_table_dictionary) == 1);
+        CHECK((a - (b - c))(st) == 3);
+        CHECK((a - (b - a))(st) == 1);
     }
     SUBCASE("Evaluation of multiplication and division")
     {
-        CHECK((a * b)(symbol_table_dictionary) == 6);
-        CHECK((a / b)(symbol_table_dictionary) == 2. / 3);
-        CHECK_THROWS_MESSAGE((a / d)(symbol_table_dictionary), "division by zero");
+        CHECK((a * b)(st) == 6);
+        CHECK((a / b)(st) == 2. / 3);
+        CHECK_THROWS_MESSAGE((a / d)(st), "division by zero");
     }
     SUBCASE("Mixed addition and multiplication")
     {
-        CHECK((a + a * b)(symbol_table_dictionary) == 8);
-        CHECK((a - b / a)(symbol_table_dictionary) == 0.5);
+        CHECK((a + a * b)(st) == 8);
+        CHECK((a - b / a)(st) == 0.5);
     }
     SUBCASE("Constant expressions")
     {
-        CHECK((7 + a)(symbol_table_dictionary) == 9);
-        CHECK((a - 7.0)(symbol_table_dictionary) == -5);
-        CHECK((7.0 + a)(symbol_table_dictionary) == 9);
-        CHECK((a - 7)(symbol_table_dictionary) == -5);
+        CHECK((7 + a)(st) == 9);
+        CHECK((a - 7.0)(st) == -5);
+        CHECK((7.0 + a)(st) == 9);
+        CHECK((a - 7)(st) == -5);
     }
     SUBCASE("Store expression and evaluate lazily")
     {
         auto expr = (a + b) * c;
         auto c_4 = c <<= 0;
-        CHECK(expr(symbol_table_dictionary) == 20);
-        CHECK(c_4(symbol_table_dictionary) == 0);
-        CHECK(expr(symbol_table_dictionary) == 0);
+        CHECK(expr(st) == 20);
+        CHECK(c_4(st) == 0);
+        CHECK(expr(st) == 0);
     }
 }

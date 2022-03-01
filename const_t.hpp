@@ -11,14 +11,12 @@ class const_t : public term_t{
     double value;
 public:
 
-    double operator()(map<string, double> &var_map) override {
+    double operator()(unordered_map<string, double> &var_map) override {
         (void) var_map;
         return value;
     }
 
-    explicit const_t (double value){
-        this->value = value;
-    }
+    explicit const_t(double value) : value(value) {}
 };
 
 #endif //CALCULATOR_CONST_T_HPP
