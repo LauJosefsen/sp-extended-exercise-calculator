@@ -8,6 +8,7 @@
 #include "term_t.hpp"
 #include "binary_t.hpp"
 #include "const_t.hpp"
+#include "unary_t.hpp"
 #include <memory>
 #include <utility>
 
@@ -23,7 +24,7 @@ public:
     shared_ptr<term_t> term;
 
     // construct term
-    explicit expr_t(term_t *term) : term(term) {}
+    expr_t(shared_ptr<term_t> term) : term(std::move(term)) {}
 
     double operator()(map<string, double> &state) {
         return (*term)(state);
@@ -47,5 +48,20 @@ public:
     expr_t operator*=(const expr_t &other) const;
     expr_t operator/=(const expr_t &other) const;
 };
+
+
+// NON MEMBER BINARY OPERATORS
+inline expr_t operator+(double lhs, const expr_t& rhs){
+    return expr_t(lhs) + rhs;
+}
+inline expr_t operator-(double lhs, const expr_t& rhs){
+    return expr_t(lhs) - rhs;
+}
+inline expr_t operator*(double lhs, const expr_t& rhs){
+    return expr_t(lhs) * rhs;
+}
+inline expr_t operator/(double lhs, const expr_t& rhs){
+    return expr_t(lhs) / rhs;
+}
 
 #endif //CALCULATOR_EXPR_T_HPP

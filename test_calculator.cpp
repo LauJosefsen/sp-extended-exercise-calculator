@@ -7,16 +7,10 @@
 TEST_CASE("Calculate expressions lazily")
 {
     auto symbol_table_dictionary = map<string, double>{};
-    auto a = expr_t(new var_t("a", 2, symbol_table_dictionary));
-    auto b = expr_t(new var_t("b", 3, symbol_table_dictionary));
-    auto c = expr_t(new var_t("c", 4, symbol_table_dictionary));
-    auto d = expr_t(new var_t("d", 0, symbol_table_dictionary));
-
-    // todo
-//    auto a = var_t("a", 2, symbol_table_dictionary);
-//    auto b = var_t("b", 3, symbol_table_dictionary);
-//    auto c = var_t("c", 4, symbol_table_dictionary);
-//    auto d = var_t("d", 0, symbol_table_dictionary);
+    auto a = expr_t(make_shared<var_t>("a", 2, symbol_table_dictionary));
+    auto b = expr_t(make_shared<var_t>("b", 3, symbol_table_dictionary));
+    auto c = expr_t(make_shared<var_t>("c", 4, symbol_table_dictionary));
+    auto d = expr_t(make_shared<var_t>("d", 0, symbol_table_dictionary));
 
     auto os = std::ostringstream();
 
@@ -73,8 +67,7 @@ TEST_CASE("Calculate expressions lazily")
         CHECK((c += b - a * c)(symbol_table_dictionary) == 1);
         CHECK(c(symbol_table_dictionary) == 1);
 
-        // todo
-//        CHECK_THROWS_MESSAGE((c - a += b - c), "assignment destination must be a variable expression");
+        CHECK_THROWS_MESSAGE((c - a += b - c), "assignment destination must be a variable expression");
     }
     SUBCASE("Parenthesis")
     {
@@ -92,22 +85,19 @@ TEST_CASE("Calculate expressions lazily")
         CHECK((a + a * b)(symbol_table_dictionary) == 8);
         CHECK((a - b / a)(symbol_table_dictionary) == 0.5);
     }
-
-    // todo
     SUBCASE("Constant expressions")
     {
         CHECK((7 + a)(symbol_table_dictionary) == 9);
         CHECK((a - 7.0)(symbol_table_dictionary) == -5);
-        CHECK((7.0 + a)(symbol_table_dictionary) == -5);
+        CHECK((7.0 + a)(symbol_table_dictionary) == 9);
         CHECK((a - 7)(symbol_table_dictionary) == -5);
     }
-//    SUBCASE("Store expression and evaluate lazily")
-//    {
-//        auto expr = (a + b) * c;
-//        auto c_4 = c <<= 4;
-//        CHECK(expr(state) == 0);
-//        CHECK(c_4(state) == 4);
-//        CHECK(expr(state) == 20);
-//    }
-//    */
+    SUBCASE("Store expression and evaluate lazily")
+    {
+        auto expr = (a + b) * c;
+        auto c_4 = c <<= 0;
+        CHECK(expr(symbol_table_dictionary) == 20);
+        CHECK(c_4(symbol_table_dictionary) == 0);
+        CHECK(expr(symbol_table_dictionary) == 0);
+    }
 }
