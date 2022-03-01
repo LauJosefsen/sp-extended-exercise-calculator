@@ -5,7 +5,7 @@
 #ifndef CALCULATOR_VAR_T_HPP
 #define CALCULATOR_VAR_T_HPP
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include "term_t.hpp"
 
@@ -13,11 +13,12 @@ using namespace std;
 
 class var_t : public term_t {
 public:
-    double operator()(map<string, double> &vars) override{
+    double operator()(unordered_map<string, double> &vars) override{
         return vars[name];
     }
 
-    var_t(const string &name, double value, map<string,double > &vars){
+    var_t(const string &name, double value, unordered_map<string,double > &vars){
+        // initialize the name and the value of the variable
         this->name = name;
         vars[name] = value;
     }

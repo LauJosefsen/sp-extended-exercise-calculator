@@ -5,7 +5,7 @@
 #ifndef CALCULATOR_TERM_T_HPP
 #define CALCULATOR_TERM_T_HPP
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <memory>
 
@@ -23,7 +23,7 @@ enum op_t {
 
 class term_t {
 public:
-    virtual double operator()(map<string, double> &state) = 0;
+    virtual double operator()(unordered_map<string, double> &state) = 0;
 
 };
 
