@@ -8,6 +8,7 @@
 \usepackage{MnSymbol} % fancy symbols for line-breaks
 \usepackage{listings} % code listings, comes with texlive-latex-recommended
 \usepackage{xcolor}
+\usepackage{hyperref}
 
 \lstdefinestyle{bwC++}{
   language=C++,morekeywords={constexpr},
@@ -53,6 +54,7 @@
     \item I wanted to move the make\_shared<> to the constructors, to indicate ownership. However I had trouble to refactor the code to achieve this, as I could not construct virtual members. I thought of creating a virtual constructor so to say, but C++ is not happy about that. Instead i ended up just moving the shared\_pointer on construction.
     \item I did not create the class assign\_t, as I just see it as a binary operator, and it fits just fine there. The rest of the compounded assignments could just be written in expr.cpp.
     \item I changed the symbol table to an unordered\_map, as that made more sense to me.
+    \item If I left out any code snippets, feel free to check the source code at \url{https://github.com/LauJosefsen/sp-extended-exercise-calculator}.
 \end{itemize}
 \section{Solution}
 \lstinputlisting[style=colorC++,caption={expr\_t.hpp}]{expr_t.hpp}
