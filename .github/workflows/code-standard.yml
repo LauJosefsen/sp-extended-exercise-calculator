@@ -9,3 +9,5 @@ jobs:
     steps:
     - name: C++ code check using clang/cppcheck/flawfinder
       uses: Tlazypanda/cpp-clang-check@0.13
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
