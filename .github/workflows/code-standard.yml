@@ -1,0 +1,13 @@
+name: C++ code standard
+
+on:
+  push:
+    branches:
+      - *
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: C++ code check using clang/cppcheck/flawfinder
+      uses: Tlazypanda/cpp-clang-check@0.13
