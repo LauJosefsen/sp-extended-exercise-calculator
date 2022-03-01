@@ -1,13 +1,12 @@
-name: C++ code standard
+name: c-linter
 
-on:
-  push:
-
+on: [push]
 jobs:
-  check:
+  c-linter:
+    name: c-linter
     runs-on: ubuntu-latest
     steps:
-    - name: C++ code check using clang/cppcheck/flawfinder
-      uses: Tlazypanda/cpp-clang-check@0.13
+      - name: c-linter
+        uses: ArtificialAmateur/clang-tidy-action@master
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
